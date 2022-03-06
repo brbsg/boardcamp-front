@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import dayjs from 'dayjs';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import styled from "styled-components";
+import dayjs from "dayjs";
 
-import PageContainer from '../components/PageContainer';
-import Loading from '../components/Loading';
-import RentalsTable from '../components/RentalsTable';
-import Editable from '../components/Form/Editable';
+import PageContainer from "../components/PageContainer";
+import Loading from "../components/Loading";
+import RentalsTable from "../components/RentalsTable";
+import Editable from "../components/Form/Editable";
 
-import * as rentalsApi from '../services/api/rentals';
-import * as api from '../services/api/customers';
+import * as rentalsApi from "../services/api/rentals";
+import * as api from "../services/api/customers";
 
-export default function Customer () {
+export default function Customer() {
   const params = useParams();
   const id = +params.customerId;
 
@@ -23,40 +23,50 @@ export default function Customer () {
     fetchRentals();
   }, [id]);
 
-  function fetchCustomer () {
-    api.getById(id).then(customer => {
-      setCustomer(customer);
-    }).catch(err => {
-      console.error(err);
-      alert('Não foi possível buscar dados do cliente!');
-    });
+  function fetchCustomer() {
+    api
+      .getById(id)
+      .then((customer) => {
+        setCustomer(customer);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Não foi possível buscar dados do cliente!");
+      });
   }
 
-  function fetchRentals () {
-    rentalsApi.list(id).then(rentals => {
-      setRentals(rentals);
-    }).catch(err => {
-      console.error(err);
-      alert('Não foi possível obter lista de alugéis do cliente!');
-    });
+  function fetchRentals() {
+    rentalsApi
+      .list(id)
+      .then((rentals) => {
+        setRentals(rentals);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Não foi possível obter lista de alugéis do cliente!");
+      });
   }
 
-  function updateBirthday (birthday) {
-    birthday = birthday.split('/').reverse().join('-');
+  function updateBirthday(birthday) {
+    birthday = birthday.split("/").reverse().join("-");
     update({ birthday });
   }
 
-  function updatePhone (phone) {
-    phone = phone.replaceAll(' ', '').replaceAll('(', '').replaceAll(')', '').replaceAll('-', '');
+  function updatePhone(phone) {
+    phone = phone
+      .replaceAll(" ", "")
+      .replaceAll("(", "")
+      .replaceAll(")", "")
+      .replaceAll("-", "");
     update({ phone });
   }
 
-  function updateName (name) {
+  function updateName(name) {
     update({ name });
   }
 
-  function updateCPF (cpf) {
-    cpf = cpf.replaceAll('.', '').replaceAll('-', '');
+  function updateCPF(cpf) {
+    cpf = cpf.replaceAll(".", "").replaceAll("-", "");
     update({ cpf });
   }
 
@@ -65,26 +75,29 @@ export default function Customer () {
     name = customer.name,
     phone = customer.phone,
     cpf = customer.cpf,
-    birthday = customer.birthday
+    birthday = customer.birthday,
   }) {
-    api.updateCustomer(id, name, phone, cpf, birthday).then(() => {
-      fetchCustomer();
-    }).catch(err => {
-      console.error(err);
-      alert('Não foi possível editar o cliente!');
-      fetchCustomer();
-    });
+    api
+      .updateCustomer(id, name, phone, cpf, birthday)
+      .then(() => {
+        fetchCustomer();
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Não foi possível editar o cliente!");
+        fetchCustomer();
+      });
   }
 
   if (!customer) return <Loading />;
 
   return (
     <PageContainer title={`Cliente - ${customer.name}`}>
-      <SectionTitle>
-        Informações de {customer.name}
-      </SectionTitle>
+      <SectionTitle>Informações de {customer.name}</SectionTitle>
 
-      <div style={{ fontSize: '12px', color: '#BBB', marginBottom: '10px' }}>Clique num dado para editá-lo</div>
+      <div style={{ fontSize: "12px", color: "#BBB", marginBottom: "10px" }}>
+        Clique num dado para editá-lo
+      </div>
 
       <Container>
         <Info>
@@ -97,8 +110,14 @@ export default function Customer () {
           <Editable
             value={
               customer.phone.length === 11
-              ? customer.phone.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3')
-              : customer.phone.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3')
+                ? customer.phone.replace(
+                    /^(\d{2})(\d{5})(\d{4})$/,
+                    "($1) $2-$3"
+                  )
+                : customer.phone.replace(
+                    /^(\d{2})(\d{4})(\d{4})$/,
+                    "($1) $2-$3"
+                  )
             }
             onChange={updatePhone}
           />
@@ -106,22 +125,34 @@ export default function Customer () {
 
         <Info>
           <Title>Aniversário:</Title>
-          <Editable value={dayjs(customer.birthday).format('DD/MM/YYYY')} onChange={updateBirthday} />
+          <Editable
+            value={dayjs(customer.birthday).format("DD/MM/YYYY")}
+            onChange={updateBirthday}
+          />
         </Info>
 
         <Info>
           <Title>CPF:</Title>
-          <Editable value={customer.cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4')} onChange={updateCPF} />
+          <Editable
+            value={customer.cpf.replace(
+              /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
+              "$1.$2.$3-$4"
+            )}
+            onChange={updateCPF}
+          />
         </Info>
       </Container>
 
-      <SectionTitle>
-        Aluguéis de {customer.name}
-      </SectionTitle>
+      <SectionTitle>Aluguéis de {customer.name}</SectionTitle>
 
-      <RentalsTable rentals={rentals} onAction={fetchRentals} isLoading={rentals === null} height="400px" />
+      <RentalsTable
+        rentals={rentals}
+        onAction={fetchRentals}
+        isLoading={rentals === null}
+        height="400px"
+      />
     </PageContainer>
-  )
+  );
 }
 
 const Container = styled.div`
@@ -135,11 +166,11 @@ const Info = styled.div`
   padding: 20px 0;
 
   &:not(:last-child) {
-    border-bottom: 1px solid #EEE;
+    border-bottom: 1px solid #eee;
   }
 
   &:nth-child(odd) {
-    background-color: #F7F7F7;
+    background-color: #f7f7f7;
   }
 `;
 

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-import Input from './Input';
+import Input from "./Input";
 
-export default function Editable ({ value, onChange, children, ...props }) {
+export default function Editable({ value, onChange, children, ...props }) {
   const [editing, setEditing] = useState(false);
   const [state, setState] = useState(value);
 
@@ -10,18 +10,25 @@ export default function Editable ({ value, onChange, children, ...props }) {
     if (!editing) {
       setState(value);
     }
-  });
+  }, [editing, value]);
 
-  function onKeyPress (event) {
-    if (event.key === 'Enter') {
+  function onKeyPress(event) {
+    if (event.key === "Enter") {
       onChange(state);
       setEditing(false);
     }
   }
 
-  return (
-    editing
-    ? <Input {...props} value={state} onChange={e => setState(e.target.value)} onKeyPress={onKeyPress} />
-    : <span style={{ cursor: 'pointer' }} onClick={() => setEditing(true)}>{state}</span>
+  return editing ? (
+    <Input
+      {...props}
+      value={state}
+      onChange={(e) => setState(e.target.value)}
+      onKeyPress={onKeyPress}
+    />
+  ) : (
+    <span style={{ cursor: "pointer" }} onClick={() => setEditing(true)}>
+      {state}
+    </span>
   );
 }
